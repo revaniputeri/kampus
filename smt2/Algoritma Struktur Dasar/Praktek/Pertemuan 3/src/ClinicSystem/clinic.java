@@ -7,14 +7,34 @@ public class clinic {
     private final Scanner input;
     private static final int MAX_PASIEN = 100;
     private Pasien[] pasienList = new Pasien[MAX_PASIEN];
-    private static String ADMIN_USERNAME = "admin";
-    private static String ADMIN_PASSWORD = "password";
+    private static UserCredentials[] credentials;
     private int jumlahPasien = 0;
     private boolean lanjutInput = true;
     private static int idOtomatis = 1;
 
     public clinic(Scanner input) {
         this.input = input;
+        credentials = new UserCredentials[] { // Initialize credentials array (optional)
+                new UserCredentials("admin", "password")
+        };
+    }
+
+    public static class UserCredentials {
+        private String username;
+        private String password;
+
+        public UserCredentials(String username, String password) {
+            this.username = username;
+            this.password = password;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public String getPassword() {
+            return password;
+        }
     }
 
     public static class Pasien {
@@ -53,7 +73,7 @@ public class clinic {
         }
     }
 
-    public boolean adminLogin() {
+    boolean adminLogin() {
         System.out.println("==========================================================================");
         System.out.print("Masukkan username admin: ");
         String inputUsername = input.nextLine();
@@ -61,10 +81,20 @@ public class clinic {
         String inputPassword = input.nextLine();
         System.out.println("==========================================================================");
 
-        return inputUsername.equals(ADMIN_USERNAME) && inputPassword.equals(ADMIN_PASSWORD);
+        if (credentials == null || credentials.length == 0) { // Handle empty credentials array
+            return false;
+        }
+
+        for (UserCredentials credential : credentials) {
+            if (credential.getUsername().equals(inputUsername) && credential.getPassword().equals(inputPassword)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
-    public void registrasiPasienBaru() {
+    void registrasiPasienBaru() {
         System.out.println("");
         System.out.println("");
         System.out.println("KLINIK X - REGISTRASI PASIEN");
@@ -85,18 +115,18 @@ public class clinic {
             printPasienDetails(newPasien);
             System.out.println("==========================================================================");
             idOtomatis++;
-            
+
             lanjutInput = lanjutInputPasien();
         }
     }
 
-    private boolean lanjutInputPasien() {
+    boolean lanjutInputPasien() {
         System.out.println("Apakah ingin memasukkan data pasien lagi? (Y/T)");
         String pilihan = input.nextLine().toUpperCase();
         return pilihan.equals("Y");
     }
 
-    private Pasien createPasienObject(String noKartu) {
+    Pasien createPasienObject(String noKartu) {
         System.out.print("Nama: ");
         String nama = input.nextLine();
         System.out.print("No KTP: ");
@@ -109,11 +139,11 @@ public class clinic {
         return new Pasien(noKartu, nama, noKtp, alamat, noTelp);
     }
 
-    private String generateKartuNumber() {
+    String generateKartuNumber() {
         return "P" + String.format("%04d", idOtomatis);
     }
 
-    private void printPasienDetails(Pasien pasien) {
+    void printPasienDetails(Pasien pasien) {
         System.out.println("No Kartu: " + pasien.getNoKartu());
         System.out.println("Nama: " + pasien.getNama());
         System.out.println("No KTP: " + pasien.getNoKtp());
